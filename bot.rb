@@ -1,4 +1,5 @@
 require 'cinch'
+require  'rspotify'
 
   def reply_random(m,list)
     m.reply list.sample
@@ -12,6 +13,12 @@ bot = Cinch::Bot.new do
     c.channels = ["#alskdj"]
   end
 
+  helpers do 
+    def spotify_artists(artist)
+      artist = RSpotify::Artist.search(artist).first
+      "#{artist.name}-#{artist.top_tracks(:US).first.name}: #{artist.top_tracks(:US).first.uri}"
+    end
+  end
   on :message, /^!britney/ do |m|
     m.reply "britneywright made me"
   end
@@ -31,6 +38,10 @@ bot = Cinch::Bot.new do
     "http://res.mindbodygreen.com/img/ftr/MyCrankypants.jpg"
     ]
   end  
+
+  on :message, /^!artist (.+)/ do |m, artists|
+    m.reply spotify_artists(artists)
+  end
 end
 
 bot.start
