@@ -1,5 +1,7 @@
 require 'cinch'
 require  'rspotify'
+require 'sequel'
+require_relative 'db'
 
   def reply_random(m,list)
     m.reply list.sample
@@ -14,11 +16,16 @@ bot = Cinch::Bot.new do
   end
 
   helpers do 
-    def spotify_artists(artist)
-      artist = RSpotify::Artist.search(artist).first
-      "#{artist.name}-#{artist.top_tracks(:US).first.name}: #{artist.top_tracks(:US).first.uri}"
+    def spotify_artists(artists)
+      artist = RSpotify::Artist.search(artists).first
+      if artist == nil
+        "Sorry, I don't know that artist."
+      else
+        "#{artist.name}-#{artist.top_tracks(:US).first.name}: #{artist.top_tracks(:US).first.uri}"
+      end
     end
   end
+  
   on :message, /^!britney/ do |m|
     m.reply "britneywright made me"
   end
@@ -42,10 +49,29 @@ bot = Cinch::Bot.new do
   on :message, /^!artist (.+)/ do |m, artists|
     m.reply spotify_artists(artists)
   end
+
+  on :message, /^hello holla_bot_girl/ do |m, nick|
+    m.reply "Hello #{m.user.nick}"
+  end
+
+  on :message, /^bye holla_bot_girl/ do |m, nick|
+    m.reply "Goodbye #{m.user.nick}"
+  end
+
+  on :message, /^!me (.+), (.+), (.+)/ do |m, nick, twitter, github|
+    DB.instance.new_peep(nick, twitter, github)
+    m.reply "You're alive!"
+  end
+
+  on :message, /^my twitter/ do |m| 
+    twitter = DB.instance.lookup_twitter(m.user.nick)
+    m.reply "Your twitter handle is #{twitter.get(:twitter)}"
+  end
 end
 
 bot.start
 
 #Other ideas
+#help
 #points
 #dice - will get help with
