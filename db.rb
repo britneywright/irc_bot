@@ -15,7 +15,7 @@ class DB
     peeps.insert(:nick => nick, :twitter => twitter, :github => github)
   end
 
-  def lookup_twitter(nick)
+  def lookup_peep(nick)
     peeps.filter(:nick => nick)
   end
 end

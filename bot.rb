@@ -26,11 +26,22 @@ bot = Cinch::Bot.new do
     end
   end
   
+  on :message, /^!help$/ do |m|
+    m.reply "Type !cute or cranky for pretty pictures."
+    m.reply "Tell us about yourself. Type !me nickname, twitter, github."
+    m.reply "Learn about others. Type !stalk nickname."
+    m.reply "More help to come!"
+  end
+
   on :message, /^!britney/ do |m|
     m.reply "britneywright made me"
   end
 
-  on :message, /^!cute$/ do |m|
+  on :message, /favorite song/ do |m|
+    m.reply "My favorite song is Hollaback Girl http://www.youtube.com/watch?v=Kgjkth6BRRY"
+  end
+
+  on :message, /^!cute$/i do |m|
     reply_random m, [
     "http://justcuteanimals.com/wp-content/uploads/2014/11/Cat-in-the-Hat-funny-cute-animal-pictures.jpg",
     "http://images4.fanpop.com/image/photos/17800000/Cute-Panda-Cubs-Together-pandas-17838800-450-324.jpg",
@@ -63,9 +74,18 @@ bot = Cinch::Bot.new do
     m.reply "You're alive!"
   end
 
+  on :message, /^!stalk (.+)/ do |m, nick|
+    peep = DB.instance.lookup_peep(nick)
+    if peep
+      m.reply "#{peep.get(:nick)} is #{peep.get(:twitter)} on Twitter and #{peep.get(:github)} on Github."
+    else
+      m.reply "You're stalking in the wrong room"
+    end
+  end
+
   on :message, /^my twitter/ do |m| 
-    twitter = DB.instance.lookup_twitter(m.user.nick)
-    m.reply "Your twitter handle is #{twitter.get(:twitter)}"
+    peep = DB.instance.lookup_peep(m.user.nick)
+    m.reply "Your twitter handle is #{peep.get(:twitter)}"
   end
 end
 
